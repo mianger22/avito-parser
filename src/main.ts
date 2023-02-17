@@ -3,13 +3,14 @@ import { clear, error, log } from "console";
 import jsdom from "jsdom";
 const {JSDOM} = jsdom;
 
-(async () => {
+async function findApartments(pageNumber: number) {
   let html: string;
+
   try {
     // формируем запрос получения всех объявлений по сдаваемым квартирам
     const baseUrl = "https://www.avito.ru/velikiy_novgorod/kvartiry/sdam/na_dlitelnyy_srok/1-komnatnye-ASgBAQICAkSSA8gQ8AeQUgFAzAgUjlk?context=H4sIAAAAAAAA_0q0MrSqLraysFJKK8rPDUhMT1WyLrYyNLNSKk5NLErOcMsvyg3PTElPLVGyrgUEAAD__xf8iH4tAAAA&localPriority=0&p=";
     // применяем его к определённой странице
-    const urlByPages: string = baseUrl + 1;
+    const urlByPages: string = baseUrl + pageNumber;
     // получаем все объявления
     const resp = await axios.get(urlByPages);
     // сохраняем их в переменную
@@ -26,7 +27,7 @@ const {JSDOM} = jsdom;
   const dom = new JSDOM(html);
   const document = dom.window.document;
   const items = document.querySelectorAll('[data-marker=item]');
-  
+
   // будем хранить ссылки, заголовки и цены
   const newAds: any = {};
 
@@ -42,4 +43,9 @@ const {JSDOM} = jsdom;
   // показываем в консоли результат
   clear();
   log("result:", newAds); 
-})()
+}
+
+// получаем все квартиры с каждой страницы
+for (let i = 0; i < 2; i++) {
+  findApartments(i);
+}
