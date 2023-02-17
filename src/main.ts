@@ -1,32 +1,48 @@
-/**
- * Some predefined delay values (in milliseconds).
- */
-export enum Delays {
-  Short = 500,
-  Medium = 2000,
-  Long = 5000,
-}
+import axios from "axios";
+import { clear, error, log } from "console";
+import jsdom from "jsdom";
+const {JSDOM} = jsdom;
 
-/**
- * Returns a Promise<string> that resolves after a given time.
- *
- * @param {string} name - A name.
- * @param {number=} [delay=Delays.Medium] - A number of milliseconds to delay resolution of the Promise.
- * @returns {Promise<string>}
- */
-function delayedHello(
-  name: string,
-  delay: number = Delays.Medium,
-): Promise<string> {
-  return new Promise((resolve: (value?: string) => void) =>
-    setTimeout(() => resolve(`Hello, ${name}`), delay),
-  );
-}
+(async ()=> {
+  let html: string;
+  try {
+    // const url = "https://www.avito.ru/moskva/telefony?q=airtag&s=104";
+    const url = "https://www.avito.ru/velikiy_novgorod/kvartiry/sdam/na_dlitelnyy_srok/1-komnatnye-ASgBAQICAkSSA8gQ8AeQUgFAzAgUjlk?context=H4sIAAAAAAAA_0q0MrSqLraysFJKK8rPDUhMT1WyLrYyNLNSKk5NLErOcMsvyg3PTElPLVGyrgUEAAD__xf8iH4tAAAA&localPriority=0";
+    const resp = await axios.get(url);
+    
+    html = resp.data;
+  } catch (e) {
+      if (axios.isAxiosError(e)) {
+        error(e);
+      } else {
+        error(e);
+      }
+  }
 
-// Below are examples of using ESLint errors suppression
-// Here it is suppressing a missing return type definition for the greeter function.
+  const dom = new JSDOM(html);
+  const document = dom.window.document;
+  const items = document.querySelectorAll('[data-marker=item]');
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export async function greeter(name: string) {
-  return await delayedHello(name, Delays.Long);
-}
+  clear();
+
+  const newAds: any = {};
+
+  items.forEach(node => {
+    newAds[node.id] = {
+      url: node.querySelector('[itemprop=url]').getAttribute('href'),
+      title: node.querySelector('[itemprop=name]').textContent,
+      price: Number(node.querySelector('[itemprop=price]').getAttribute('content'))
+    }
+  })
+
+  // items.forEach(node => {
+  //   newAds[node.id] = {
+  //     id: node.id,
+  //     url: node.querySelector('[itemprop=url]').getAttribute('href'),
+  //     title: node.querySelector('[itemprop=name]').textContent,
+  //     price: Number(node.querySelector('[itemprop=price]').getAttribute('content'))
+  //   }
+  // })
+
+  log("newAds:", newAds); 
+})()
