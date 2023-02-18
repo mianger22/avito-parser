@@ -34,15 +34,17 @@ async function findApartments(pageNumber: number) {
   const items = document.querySelectorAll('[data-marker=item]');
 
   // будем хранить ссылки, заголовки и цены
-  const newAds: any = {};
+  const newAds: any = [];
 
   // получаем нужные данные
   items.forEach(node => {
-    newAds[node.id] = {
+    // получаем ссылку на объявление
+    newAds.push({
+      id: node.id,
       url: node.querySelector('[itemprop=url]').getAttribute('href'),
       title: node.querySelector('[itemprop=name]').textContent,
       price: Number(node.querySelector('[itemprop=price]').getAttribute('content'))
-    }
+    })
   })
 
   // отдаём браузеру результат
@@ -55,7 +57,7 @@ let output: any = [];
 // получаем все квартиры с каждой страницы
 for (let i = 1; i < numberPages; i++) {
   let pageData = await findApartments(i);
-  output.push({"Новая страница": pageData});
+  output.push(pageData);
 }
 
 export default output;
