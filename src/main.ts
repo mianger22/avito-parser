@@ -41,7 +41,7 @@ async function findApartments(pageNumber: number) {
     // получаем ссылку на объявление
     newAds.push({
       id: node.id,
-      url: node.querySelector('[itemprop=url]').getAttribute('href'),
+      url: 'https://avito.ru/' + node.querySelector('[itemprop=url]').getAttribute('href'),
       title: node.querySelector('[itemprop=name]').textContent,
       price: Number(node.querySelector('[itemprop=price]').getAttribute('content'))
     })
