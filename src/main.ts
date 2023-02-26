@@ -37,14 +37,18 @@ async function findApartments(pageNumber: number) {
   const newAds: any = [];
 
   // получаем нужные данные
-  items.forEach(node => {     
+  items.forEach(node => {  
+    const content = node.textContent;   
+
     // получаем ссылку на объявление
     newAds.push({
       id: node.id,
       url: 'https://avito.ru/' + node.querySelector('[itemprop=url]').getAttribute('href'),
       title: node.querySelector('[itemprop=name]').textContent,
       price: Number(node.querySelector('[itemprop=price]').getAttribute('content')),
-      realtor: node.textContent.indexOf('Агентство') != -1 ? true : false
+      realtor: content.indexOf('Агентство') != -1 ? true : false,
+      rooms: content.indexOf('1-к.') != -1 ? 1 : content.indexOf('2-к.') != -1 ? 2 : 3,
+      collateral: content.indexOf('залога') != -1 ? false : true
     })
   })
 
